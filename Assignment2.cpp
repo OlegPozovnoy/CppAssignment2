@@ -59,15 +59,13 @@ typedef struct battery {
 		std::cout << "\nBattery voltage: " << this->voltage;
 		std::cout << "\nBattery type: " << this->batteryType;
 	}
-
-
 };
 
 
-bool power_device(double amps, double time, battery battery);
+bool power_device(double amps, double time, battery& battery);
 double max_time(battery battery, double amps);
-void recharge(battery battery);
-battery batteryInit();
+void recharge(battery& battery); 
+battery batteryInit(); // creates a battery based on user input
 
 int main()
 {
@@ -382,7 +380,7 @@ void countingSort(int arrRef[], double& sortTime) {
 }
 
 
-bool power_device(double amps, double time, battery battery) {
+bool power_device(double amps, double time, battery& battery) {
 
 	std::cout << "\n\nPowering the battery with " << amps << " Ampers for " << time << " seconds";
  
@@ -392,7 +390,6 @@ bool power_device(double amps, double time, battery battery) {
 	}
 	else {
 		battery.energyCapacityCurrent -= amps * battery.voltage*time;
-		std::cout << "\nThe new battery characteristics:";
 		battery.display();
 		return true;
 	}
@@ -401,11 +398,11 @@ bool power_device(double amps, double time, battery battery) {
 double max_time(battery battery, double amps) {
 	std::cout << "\n\nComputing the max battery operation time for current of " << amps << " Amps" ;
 	double time = battery.energyCapacityCurrent/battery.voltage/amps;
-	std::cout << "\nThe current battery operation time is: " << round(time) << " seconds";
+	std::cout << "\nThe battery operation time is: " << round(time) << " seconds";
 	return time;
 }
 
-void recharge(battery battery) {
+void recharge(battery& battery) {
 	std::cout << "\n\nRecharging the battery";
 	battery.energyCapacityCurrent = battery.energyCapacityMax;
 	std::cout << "\nThe battery was fully recharged";
@@ -417,14 +414,29 @@ void batteryAssignment() {
 	double amps, time;
 
 	std::string batteryType = std::string("NiCad");
-
+	//Create a battery model that is 12 volts and can hold a maximum energy storage of 5 x 10^6 J.
+	//When created the battery should be fully charged
 	battery battery(batteryType,12,5*pow(10,6), 5 * pow(10,6));
-	battery.display();
+	//With the battery power a 4 amp light for 15 minutes
 	power_device(4, 15, battery);
+	//With the remaining capacity of the battery determine how long the battery could operate an 8
+	//amp light
 	max_time(battery, 8);
-	recharge(battery);
+	//Use the display function to print the current energy level to the screen once the program is
+	//returned to main(looking to verify that it is updated rather than local only)
 	battery.display();
-
+	//Recharge the battery
+	recharge(battery);
+	//Display to the screen the
+	//current energy level once charged with a description that the battery has been charged from
+	//main using the display function
+	battery.display();
+	//Recalculate how long the battery could operate an 8 amp light now that it is fully charged
+	max_time(battery, 8);
+	//Use the display function to print the current energy level to the screen once the program is
+	//returned to main(looking to verify that it is updated rather than local only)
+	battery.display();
+	
 	do {
 		std::cout << "\n\nPlease select your next action from the list: ";
 		std::cout << "\n1 - Display";
@@ -441,9 +453,9 @@ void batteryAssignment() {
 			battery.display();
 			break;
 		case 2:
-			std::cout << "please enter ampers:";
+			std::cout << "\nPlease enter the current in Amps:";
 			std::cin >> amps;
-			std::cout << "please enter time in seconds:";
+			std::cout << "\nPlease enter time in seconds:";
 			std::cin >> time;
 			power_device(amps,time,battery);
 			battery.display();
@@ -452,24 +464,30 @@ void batteryAssignment() {
 			std::cout << "please enter ampers:";
 			std::cin >> amps;
 			max_time(battery, amps);
+			//Use the display function to print the current energy level to the screen once the program is
+			//returned to main(looking to verify that it is updated rather than local only)
 			battery.display();
 			break;
 		case 4:
 			recharge(battery);
+			//Display to the screen the
+			//current energy level once charged with a description that the battery has been charged from
+			//main using the display function
 			battery.display();
 			break;
 		case 5:
+			//redefining the battery
 			battery = batteryInit();
 			break;
 		case 6:
 			break;
 
 		default:
-			std::cout << "/nWrong input, please try again";
+			std::cout << "\nWrong input, please try again";
 		}
 	} while (pick != 6);
 
-	std::cout << "Thank you for using the battery application";
+	std::cout << "\nThank you for using the battery application";
 }
 
 
